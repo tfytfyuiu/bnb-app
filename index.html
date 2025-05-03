@@ -1,0 +1,2827 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNB-Business</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+    #mainContent, .sidebar-toggle {
+        display: none;
+    }
+
+    :root {
+        --primary-color: #1e40af;
+        --secondary-color: #dbeafe;
+        --danger-color: #b91c1c;
+        --success-color: #15803d;
+        --border-radius: 12px;
+        --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        --gradient-speed: 15s;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .theme-blue { background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa, #dbeafe); }
+    .theme-orange { background: linear-gradient(135deg, #c2410c, #ea580c, #f97316, #fed7aa); }
+    .theme-green { background: linear-gradient(135deg, #15803d, #16a34a, #22c55e, #86efac); }
+    .theme-purple { background: linear-gradient(135deg, #6b21a8, #9333ea, #c084fc, #e9d5ff); }
+    .theme-red { background: linear-gradient(135deg, #991b1b, #dc2626, #ef4444, #fecaca); }
+    .theme-teal { background: linear-gradient(135deg, #0f766e, #2dd4bf, #5eead4, #ccfbf1); }
+    .theme-pink { background: linear-gradient(135deg, #be185d, #ec4899, #f472b6, #fce7f3); }
+
+    body {
+        font-family: 'Cairo', sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+        background-size: 400% 400%;
+        animation: gradient var(--gradient-speed) ease infinite;
+        margin: 0;
+        overflow-x: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .btn-save {
+        background: linear-gradient(45deg, #10b981, #34d399);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -250px; /* مخفي افتراضيًا */
+        width: 250px;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(30, 64, 175, 0.1));
+        backdrop-filter: blur(15px);
+        box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
+        z-index: 2000;
+        transition: left 0.3s ease;
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow-y: auto;
+        border-right: 3px solid rgba(30, 64, 175, 0.3);
+    }
+
+    .sidebar.active {
+        left: 0; /* يظهر عند تفعيل الكلاس */
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background: linear-gradient(45deg, #1e40af, #60a5fa);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    .sidebar-section {
+        margin-bottom: 0.5rem;
+        padding: 0.5rem 0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-section:hover {
+        background: rgba(30, 64, 175, 0.05);
+    }
+
+    .sidebar-btn {
+        background: linear-gradient(45deg, var(--primary-color), #60a5fa);
+        color: white;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: right;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .sidebar-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .support-btn {
+        background: linear-gradient(45deg, #25D366, #34d399);
+    }
+
+    .backup-btn {
+        background: linear-gradient(45deg, #0284c7, #38bdf8);
+    }
+
+    .restore-btn {
+        background: linear-gradient(45deg, #d97706, #fbbf24);
+    }
+
+    .logout-btn {
+        background: linear-gradient(45deg, #dc2626, #f87171);
+    }
+
+    .color-picker-btn {
+        background: linear-gradient(45deg, var(--primary-color), #60a5fa);
+    }
+
+    .color-options {
+        display: none;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        padding: 12px;
+        flex-direction: column;
+        gap: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .color-option {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .color-option:hover {
+        transform: scale(1.2);
+    }
+
+    .user-info-container {
+        background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(96, 165, 250, 0.7));
+        border: 2px solid #1e40af;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-align: center;
+    }
+
+    .user-info {
+        font-weight: 600;
+        color: white;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .user-info::before {
+        content: '\f007';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: #dbeafe;
+        font-size: 0.8rem;
+    }
+
+    .search-container {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .search-input {
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        border: 2px solid #e5e7eb;
+        width: 100%;
+        transition: all 0.3s ease;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+        outline: none;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 9999;
+    }
+
+    .toast {
+        background: #fff;
+        border-radius: 6px;
+        padding: 12px 18px;
+        margin-bottom: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        border-right: 3px solid #10b981;
+        color: #10b981;
+    }
+
+    .toast.error {
+        border-right: 3px solid #dc2626;
+        color: #dc2626;
+    }
+
+    .modal-content {
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(90deg, var(--primary-color), #60a5fa);
+        color: white;
+        border-bottom: none;
+        padding: 0.8rem 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+        background: #fff;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 0.8rem 1rem;
+        background: #f9fafb;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 576px) {
+        .sidebar { width: 200px; left: -200px; }
+        .sidebar.active { left: 0; }
+        .search-container { flex-direction: column; }
+    }
+
+    .debt-counter {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        position: relative;
+    }
+
+    .debt-counter.owed-to-me {
+        background: linear-gradient(45deg, #10b981, #34d399);
+    }
+
+    .debt-counter.owed-from-me {
+        background: linear-gradient(45deg, #dc2626, #f87171);
+    }
+
+    .debt-counter.net-debt {
+        background: linear-gradient(45deg, #d4af37, #ffd700);
+    }
+
+    .debt-counter span {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: black;
+        margin: 2px 0;
+    }
+
+    .debt-counter .amount {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: black;
+    }
+
+    .debt-counter .label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.9);
+    }
+
+    .login-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+    }
+
+    .login-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .login-box .form-label {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .login-box .form-control {
+        border-radius: 8px;
+        padding: 10px 12px;
+        border: 2px solid #e5e7eb;
+        transition: border-color 0.3s ease;
+    }
+
+    .login-box .form-control:focus {
+        border-color: #1e40af;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+        outline: none;
+    }
+
+    .login-box .btn-primary {
+        background: linear-gradient(45deg, #1e40af, #60a5fa);
+        border: none;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .login-box .btn-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-box .form-check-label {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .notifications-icon {
+        position: relative;
+    }
+
+    .btn-notifications {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-notifications:hover {
+        transform: scale(1.1);
+    }
+
+    .notifications-dropdown {
+        backdrop-filter: blur(10px);
+        border: 1px solid #e5e7eb;
+    }
+
+    .notifications-list li {
+        padding: 8px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1e293b;
+        font-size: 0.9rem;
+    }
+
+    .notifications-list li:last-child {
+        border-bottom: none;
+    }
+
+    .notifications-list small {
+        color: #64748b;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 2px;
+    }
+      .notifications-list li.unread {
+    background: #dbeafe !important; /* خلفية زرقاء فاتحة للإشعارات غير المقروءة */
+    border-right: 4px solid #1e40af; /* إطار أزرق على الجانب الأيمن */
+    font-weight: 600; /* نص أكثر وضوحًا */
+}
+   .input-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.otp-group {
+    position: relative;
+    text-align: center;
+}
+.otp-group label {
+    display: block;
+    font-size: 12px;
+    color: #007BFF;
+}
+#otpInput {
+    padding: 5px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+#otpInput:focus {
+    border-color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+}
+#requestOtpBtn {
+    background: linear-gradient(45deg, #1e40af, #60a5fa);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease;
+}
+#requestOtpBtn:hover {
+    transform: scale(1.05);
+}  
+</style>
+</head>
+<body class="theme-blue">
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="login-container" id="loginContainer">
+    <div class="login-box">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" class="form-control" id="phoneNumber" placeholder="ادخل رقم هاتفك" required>
+        <input type="password" class="form-control mt-3" id="password" placeholder="ادخل كلمة المرور" required>
+        <button class="btn btn-primary mt-3" onclick="handleLogin('permanent')">تسجيل الدخول</button>
+        <p class="mt-3 text-center">للدعم الفني: <a href="https://wa.me/0201000072951" target="_blank">0201000072951</a></p>
+    </div>
+</div>
+    </div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">...</button>
+    <div class="sidebar" id="sidebar">
+    <button class="sidebar-close" onclick="toggleSidebar()" style="background: none; border: none; color: #dc2626; font-size: 1.5rem; position: absolute; top: 10px; right: 10px;">
+        <i class="fas fa-times"></i>
+    </button>
+    <!-- 1. مستخدم -->
+    <div class="sidebar-section">
+        <div class="user-info-container">
+            <div class="user-info" id="userInfo"></div>
+        </div>
+    </div>
+   <div class="sidebar-section">
+    <button class="sidebar-btn" onclick="toggleLockSettings()" style="background: linear-gradient(45deg, #1e40af, #60a5fa);">
+        <i class="fas fa-lock me-2"></i> قفل التطبيق
+    </button>
+    <div id="lockSettings" class="color-options" style="display: none;">
+        <div class="form-check">
+            <input type="checkbox" id="enableLock" class="form-check-input">
+            <label class="form-check-label" for="enableLock" style="color: #1e293b;">تفعيل قفل التطبيق</label>
+        </div>
+    </div>
+</div> 
+ <button class="sidebar-btn" onclick="changePasswordPrompt()" style="background: linear-gradient(45deg, #6b21a8, #9333ea);">
+  <i class="fas fa-key me-2"></i> تغيير كلمة المرور
+</button>
+
+    <!-- 2. الدعم الفني -->
+    <div class="sidebar-section">
+        <button class="sidebar-btn support-btn" onclick="confirmSupport()">
+            <i class="fab fa-whatsapp me-2"></i> الدعم الفني
+        </button>
+    </div>
+
+    <!-- 3. تغيير الألوان -->
+    <div class="sidebar-section">
+        <button class="sidebar-btn color-picker-btn" onclick="toggleColorPicker()">
+            <i class="fas fa-palette me-2"></i> تغيير الألوان
+        </button>
+        <div class="color-options" id="colorOptions" style="display: none; background: rgba(255, 255, 255, 0.95); border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); padding: 12px; flex-direction: column; gap: 10px; backdrop-filter: blur(10px);">
+            <div class="color-option" data-color="blue" style="background-color: #2563eb; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="orange" style="background-color: #f97316; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="green" style="background-color: #16a34a; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="purple" style="background-color: #9333ea; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="red" style="background-color: #dc2626; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="teal" style="background-color: #2dd4bf; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+            <div class="color-option" data-color="pink" style="background-color: #ec4899; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;"></div>
+        </div>
+    </div>
+
+    <!-- 4. نسخة احتياطية JSON -->
+<div class="sidebar-section">
+    <button class="sidebar-btn backup-btn" onclick="exportToJson()">
+        <i class="fas fa-download me-2"></i> تصدير JSON
+    </button>
+</div>
+
+<!-- 5. استعادة من JSON -->
+<div class="sidebar-section">
+    <label class="sidebar-btn restore-btn" style="cursor: pointer;">
+        <i class="fas fa-upload me-2"></i> استيراد JSON
+        <input type="file" id="restoreJsonInput" accept=".json" style="display: none;" onchange="importFromJson(event)">
+    </label>
+</div>
+
+    <!-- 6. سياسة الخصوصية -->
+    <div class="sidebar-section">
+        <a href="https://www.e-droid.net/privacy.php?ida=3509225&idl=en" target="_blank" class="sidebar-btn privacy-link">
+            <i class="fas fa-shield-alt me-2"></i> سياسة الخصوصية
+        </a>
+    </div>
+
+    <!-- 7. تسجيل الخروج -->
+    <div class="sidebar-section">
+        <button class="sidebar-btn logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt me-2"></i> تسجيل الخروج
+        </button>
+    </div>
+</div>
+    <div class="container mt-4" id="mainContent">
+    <!-- أيقونة الإشعارات (تعريف واحد فقط) -->
+    <div class="notifications-icon" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
+        <button class="btn-notifications" onclick="toggleNotifications()" style="background: none; border: none; color: #1e40af; font-size: 1.5rem; position: relative;">
+            <i class="fas fa-bell"></i>
+            <span id="notificationCount" style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; display: none;">0</span>
+        </button>
+        <div class="notifications-dropdown" id="notificationsDropdown" style="display: none; position: absolute; top: 40px; right: 0; width: 300px; max-height: 400px; background: rgba(255, 255, 255, 0.95); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); padding: 10px; z-index: 2000; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 style="color: #1e40af; font-size: 1rem; font-weight: 600; margin: 0;">الإشعارات</h4>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button onclick="deleteAllNotifications()" style="background: none; border: none; color: #dc2626; font-size: 0.9rem;" title="حذف جميع الإشعارات">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button onclick="toggleNotifications()" style="background: none; border: none; color: #dc2626; font-size: 1.2rem;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <ul id="notificationsList" class="notifications-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+    </div>
+    <!-- نهاية أيقونة الإشعارات -->
+
+    <!-- العنوان الرئيسي -->
+    <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold header-title" style="color: #1e293b; text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);">
+                <i class="fas fa-wallet me-2"></i>BNB-Business
+            </h1>
+            <p class="header-subtitle" style="color: #64748b; font-size: 1rem;">إدارة ديونك بكفاءة عالية</p>
+        </div>
+        <div class="card main-card" style="border-radius: var(--border-radius); box-shadow: var(--card-shadow);">
+            <div class="card-header" style="background: linear-gradient(90deg, var(--primary-color), #60a5fa); color: white; padding: 1rem; border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius);">
+                <h3 class="mb-0">👇BNB-Business-notebook👇</h3>
+            </div>
+           <div class="card-body p-3">
+                <button class="btn btn-primary w-100 mb-3" onclick="showAddClientModal()" style="background: linear-gradient(45deg, var(--primary-color), #60a5fa); padding: 10px; font-weight: 600; border-radius: 8px;">
+                    <i class="fas fa-user-plus me-2"></i>اضافة عميل جديد
+                </button>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن عميل...">
+                </div>
+                <div id="clientsList"></div>
+            </div>
+        </div>
+    </div>
+               
+
+    <div class="modal fade" id="addClientModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 365px;">
+        <div class="modal-content" style="background: #ffffff; border-radius: 12px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); border: none; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(120deg, #2a4365, #1e3a8a); padding: 0.7rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <h5 class="modal-title" style="font-size: 1rem; font-weight: 600; color: #ffffff; letter-spacing: 0.5px;">
+                    <i class="fas fa-user-plus me-2" style="color: #93c5fd;"></i> إضافة عميل جديد
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="background: rgba(255, 255, 255, 0.2); border-radius: 50%; width: 20px; height: 20px; padding: 0;"></button>
+            </div>
+            <div class="modal-body" style="padding: 1rem; background: #f8fafc;">
+                <form id="clientForm" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <div>
+                        <label for="clientName" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">اسم العميل</label>
+                        <input type="text" class="form-control" id="clientName" required style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: border-color 0.2s ease, box-shadow 0.2s ease;">
+                    </div>
+                    <div class="input-group">
+                        <label for="amount" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">المبلغ</label>
+                        <input type="text" class="form-control" id="amount" required style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: border-color 0.2s ease, box-shadow 0.2s ease;" oninput="formatAmount(this)">
+                        <span class="input-group-text" style="border-radius: 0 8px 8px 0; background: #f1f5f9; cursor: pointer;" onclick="toggleCalculator('amount')">
+                            <i class="fas fa-calculator" style="color: #1e40af;"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <label for="description" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">وصف المعاملة</label>
+                        <textarea class="form-control" id="description" required rows="2" style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); resize: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;"></textarea>
+                    </div>
+                    <div>
+                        <label for="dueDate" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">موعد السداد (اختياري)</label>
+                        <input type="datetime-local" class="form-control" id="dueDate" style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: border-color 0.2s ease, box-shadow 0.2s ease;">
+                    </div>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-success" onclick="saveClient('toMe')" style="background: linear-gradient(45deg, #10b981, #34d399); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                            <i class="fas fa-check-circle me-2"></i> ليا
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="saveClient('fromMe')" style="background: linear-gradient(45deg, #dc2626, #f87171); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                            <i class="fas fa-times-circle me-2"></i> عليا
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="addTransactionModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة معاملة جديدة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="client-name-header fw-bold mb-2">العميل: <span id="addTransactionClientName"></span></div>
+                    <form id="transactionForm">
+                        <input type="hidden" id="transactionClientId">
+                        <div class="mb-2">
+                            <label class="form-label">المبلغ</label>
+                            <input type="text" class="form-control" id="transactionAmount" required oninput="formatAmount(this)">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">وصف المعاملة</label>
+                            <textarea class="form-control" id="transactionDescription" required rows="2"></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">موعد السداد (اختياري)</label>
+                            <input type="datetime-local" class="form-control" id="transactionDueDate">
+                        </div>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" onclick="saveTransaction('toMe')" style="background: linear-gradient(45deg, #10b981, #34d399); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                                <i class="fas fa-check-circle me-2"></i> ليا
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="saveTransaction('fromMe')" style="background: linear-gradient(45deg, #dc2626, #f87171); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                                <i class="fas fa-times-circle me-2"></i> عليا
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div class="modal fade" id="collectPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 365px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(90deg, #10b981, #34d399);">
+                <h5 class="modal-title">تحصيل دفعة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="client-name-header fw-bold mb-2">العميل: <span id="paymentClientName"></span></div>
+                <div class="max-amount-info text-muted mb-2">الحد الأقصى للتحصيل: <span id="maxPaymentAmount"></span></div>
+                <form id="paymentForm" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <input type="hidden" id="paymentClientId">
+                    <input type="hidden" id="paymentDebtType"> <!-- إضافة حقل مخفي لتخزين نوع الدين -->
+                    <div class="input-group">
+                        <label for="paymentAmount" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">المبلغ المحصل</label>
+                        <input type="text" class="form-control" id="paymentAmount" required oninput="formatAmount(this)" style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: border-color 0.2s ease, box-shadow 0.2s ease;">
+                        <span class="input-group-text" style="border-radius: 0 8px 8px 0; background: #f1f5f9; cursor: pointer;" onclick="toggleCalculator('paymentAmount')">
+                            <i class="fas fa-calculator" style="color: #1e40af;"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <label for="paymentDescription" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">وصف الدفعة</label>
+                        <textarea class="form-control" id="paymentDescription" required rows="2" style="font-size: 0.9rem; padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); resize: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-success" onclick="savePayment()" style="background: linear-gradient(45deg, #10b981, #34d399); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                            <i class="fas fa-check-circle me-2"></i> تحصيل
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 365px;">
+        <div class="modal-content">
+    <div class="modal-header" style="background: linear-gradient(90deg, #0ea5e9, #38bdf8);">
+        <h5 class="modal-title">تعديل المعاملة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        <div class="client-name-header fw-bold mb-2">العميل: <span id="editTransactionClientName"></span></div>
+        <form id="editTransactionForm" style="display: flex; flex-direction: column; gap: 0.8rem;">
+            <input type="hidden" id="editTransactionClientId">
+            <input type="hidden" id="editTransactionId">
+            <div class="input-group">
+                <label for="editTransactionAmount" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">المبلغ</label>
+                <input type="text" class="form-control" id="editTransactionAmount" required oninput="formatAmount(this)">
+                <span class="input-group-text" style="border-radius: 0 8px 8px 0; background: #f1f5f9; cursor: pointer;" onclick="toggleCalculator('editTransactionAmount')">
+                    <i class="fas fa-calculator" style="color: #1e40af;"></i>
+                </span>
+            </div>
+            <div>
+                <label for="editTransactionDescription" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">وصف المعاملة</label>
+                <textarea class="form-control" id="editTransactionDescription" required rows="2"></textarea>
+            </div>
+            <div>
+                <label for="editTransactionDueDate" style="font-size: 0.85rem; color: #1e293b; font-weight: 600; margin-bottom: 0.3rem; display: block;">موعد السداد (اختياري)</label>
+                <input type="datetime-local" class="form-control" id="editTransactionDueDate">
+            </div>
+            <div class="debt-type-buttons" style="display: flex; gap: 10px; justify-content: center;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="editDebtType" id="editDebtToMe" value="toMe" required>
+                    <label class="form-check-label btn btn-success" for="editDebtToMe" style="padding: 6px 12px; border-radius: 8px;">
+                        <i class="fas fa-arrow-down me-1"></i> ليا
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="editDebtType" id="editDebtFromMe" value="fromMe">
+                    <label class="form-check-label btn btn-danger" for="editDebtFromMe" style="padding: 6px 12px; border-radius: 8px;">
+                        <i class="fas fa-arrow-up me-1"></i> عليا
+                    </label>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-primary" onclick="saveEditedTransaction()" style="background: linear-gradient(45deg, #0ea5e9, #38bdf8); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;">
+                    <i class="fas fa-save me-2"></i> حفظ التعديلات
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 365px;">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(90deg, #1e40af, #60a5fa);">
+        <h5 class="modal-title">تغيير كلمة المرور</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="changePasswordForm">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">كلمة المرور الحالية</label>
+            <input type="password" class="form-control" id="currentPassword" required>
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">كلمة المرور الجديدة</label>
+            <input type="password" class="form-control" id="newPassword" required>
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" class="form-control" id="confirmPassword" required>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="changePassword()">تغيير</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script>
+       let clients = [];
+    let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const clientColors = ['#2563eb', '#f97316', '#16a34a', '#9333ea', '#dc2626', '#2dd4bf', '#ec4899', '#8b5cf6'];
+
+    const dbName = "DebtRecordDB";
+    const storeName = "clients";
+    let db;
+
+
+       function addNotification(message, type = 'login', clientId = null, amount = null, debtType = null) {
+    const timestamp = formatDateTime();
+    let updatedNotifications = [...notifications];
+
+    if (type === 'login') {
+        updatedNotifications = updatedNotifications.filter(n => n.type !== 'login');
+    }
+
+    let enhancedMessage = message;
+    if (type === 'backup') {
+        enhancedMessage = `📥 ${message} (${timestamp})`;
+    } else if (type === 'restore') {
+        enhancedMessage = `📤 ${message} (${timestamp})`;
+    }
+
+    updatedNotifications.unshift({
+        message: enhancedMessage,
+        timestamp,
+        read: false,
+        type,
+        clientId,
+        amount,
+        debtType
+    });
+
+    if (updatedNotifications.length > 50) updatedNotifications.pop();
+
+    notifications = updatedNotifications;
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+    updateNotifications();
+    playNotificationSound(type === 'error' ? 'delete' : 'success');
+}
+function openTrialWindow() {
+    const trialWindow = window.open('', 'TrialWindow', 'width=400,height=500');
+    if (!trialWindow) {
+        alert('تم حظر النافذة المنبثقة، قم بإلغاء الحظر في إعدادات المتصفح');
+        return;
+    }
+    const doc = trialWindow.document;
+    doc.open();
+    
+    const html = doc.createElement('html');
+    const head = doc.createElement('head');
+    const title = doc.createElement('title');
+    title.textContent = 'تجربة التطبيق';
+    const style = doc.createElement('style');
+    style.textContent = `
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: #007BFF; /* لون أزرق للخلفية */
+            color: white; /* لون النص أبيض للتباين */
+        }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background-color: #0056b3; color: white; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #003d82; }
+        #otpDisplay { display: none; margin-top: 20px; font-size: 18px; color: #28a745; }
+        #backButton { background-color: #6c757d; }
+        #backButton:hover { background-color: #5a6268; }
+        #loginButton { background-color: #28a745; }
+        #loginButton:hover { background-color: #218838; }
+    `;
+    head.appendChild(title);
+    head.appendChild(style);
+
+    const body = doc.createElement('body');
+    const h2 = doc.createElement('h2');
+    h2.textContent = 'تجربة التطبيق (24 ساعة)';
+    const phoneInput = doc.createElement('input');
+    phoneInput.type = 'text';
+    phoneInput.id = 'trialPhone';
+    phoneInput.placeholder = 'ادخل رقم هاتفك';
+    phoneInput.required = true;
+    const continueButton = doc.createElement('button');
+    continueButton.textContent = 'متابعة';
+    continueButton.onclick = function() {
+        const phoneNumber = doc.getElementById('trialPhone').value.trim();
+        if (!phoneNumber) { alert('يرجى إدخال رقم الهاتف'); return; }
+        const trialCount = parseInt(sessionStorage.getItem('trialCount') || '0');
+        if (trialCount >= 2) { alert('لقد استنفدت مرات التجربة، تواصل مع الدعم الفني لشراء النسخة'); return; }
+        const otpTimestamp = sessionStorage.getItem('otpTimestamp');
+        const isOTPExtant = otpTimestamp && (Date.now() - parseInt(otpTimestamp) < 86400000);
+        if (!isOTPExtant) {
+            const newOTP = generateCode();
+            sessionStorage.setItem('trialPhone', phoneNumber);
+            sessionStorage.setItem('trialOTP', newOTP);
+            sessionStorage.setItem('otpTimestamp', Date.now().toString());
+            sessionStorage.setItem('trialCount', (trialCount + 1).toString());
+            doc.getElementById('otpDisplay').style.display = 'block';
+            doc.getElementById('otpCode').textContent = newOTP;
+        } else {
+            const existingOTP = sessionStorage.getItem('trialOTP');
+            doc.getElementById('otpDisplay').style.display = 'block';
+            doc.getElementById('otpCode').textContent = existingOTP;
+        }
+        doc.getElementById('otpInputContainer').style.display = 'block';
+    };
+    const backButton = doc.createElement('button');
+    backButton.id = 'backButton';
+    backButton.textContent = 'عودة';
+    backButton.onclick = function() {
+        trialWindow.close(); // إغلاق النافذة فقط
+    };
+
+    // قسم عرض الـ OTP
+    const otpDisplay = doc.createElement('div');
+    otpDisplay.id = 'otpDisplay';
+    otpDisplay.innerHTML = 'رمز التجربة الخاص بك: <span id="otpCode"></span>';
+
+    // حقل إدخال الـ OTP وزَر تسجيل الدخول
+    const otpInputContainer = doc.createElement('div');
+    otpInputContainer.id = 'otpInputContainer';
+    otpInputContainer.style.display = 'none';
+    const otpInput = doc.createElement('input');
+    otpInput.type = 'text';
+    otpInput.id = 'otpInput';
+    otpInput.placeholder = 'ادخل رمز التجربة هنا';
+    const loginButton = doc.createElement('button');
+    loginButton.id = 'loginButton';
+    loginButton.textContent = 'تسجيل الدخول';
+    loginButton.onclick = function() {
+        const enteredOTP = doc.getElementById('otpInput').value.trim();
+        const trialPhone = sessionStorage.getItem('trialPhone');
+        const trialOTP = sessionStorage.getItem('trialOTP');
+        const otpTimestamp = sessionStorage.getItem('otpTimestamp');
+        const isOTPExtant = otpTimestamp && (Date.now() - parseInt(otpTimestamp) < 86400000);
+
+        if (enteredOTP === trialOTP && isOTPExtant) {
+            if (window.opener && !window.opener.closed) {
+                // إرسال رسالة إلى النافذة الرئيسية لتسجيل الدخول
+                window.opener.postMessage({
+                    type: 'trialLogin',
+                    phone: trialPhone
+                }, '*');
+                trialWindow.close();
+            } else {
+                alert('النافذة الرئيسية غير متاحة، أغلق النافذة وجرب تسجيل الدخول يدويًا');
+                trialWindow.close();
+            }
+        } else {
+            alert('رمز التجربة غير صحيح أو منتهي الصلاحية');
+        }
+    };
+
+    otpInputContainer.appendChild(otpInput);
+    otpInputContainer.appendChild(loginButton);
+
+    body.appendChild(h2);
+    body.appendChild(phoneInput);
+    body.appendChild(continueButton);
+    body.appendChild(backButton);
+    body.appendChild(otpDisplay);
+    body.appendChild(otpInputContainer);
+    html.appendChild(head);
+    html.appendChild(body);
+    doc.appendChild(html);
+    doc.close();
+}
+
+function generateCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'trialLogin') {
+        const phoneNumber = event.data.phone;
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.querySelector('.sidebar-toggle').style.display = 'flex';
+        document.getElementById('userInfo').textContent = `مستخدم تجريبي: ${phoneNumber}`;
+        document.getElementById('userInfo').style.color = '#FFFFFF';
+        addNotification('تم تسجيل الدخول كمستخدم تجريبي (24 ساعة)');
+    }
+}, false);
+function openPurchaseWindow() {
+    const purchaseWindow = window.open('', 'PurchaseWindow', 'width=400,height=400');
+    if (!purchaseWindow) {
+        alert('تم حظر النافذة المنبثقة، قم بإلغاء الحظر في إعدادات المتصفح');
+        return;
+    }
+    const doc = purchaseWindow.document;
+    doc.open();
+
+    const html = doc.createElement('html');
+    const head = doc.createElement('head');
+    const title = doc.createElement('title');
+    title.textContent = 'شراء النسخة';
+    const style = doc.createElement('style');
+    style.textContent = `
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    `;
+    head.appendChild(title);
+    head.appendChild(style);
+
+    const body = doc.createElement('body');
+    const h2 = doc.createElement('h2');
+    h2.textContent = 'شراء النسخة الدائمة';
+    const input = doc.createElement('input');
+    input.type = 'text';
+    input.id = 'purchasePhone';
+    input.placeholder = 'ادخل رقم هاتفك';
+    input.required = true;
+    const button = doc.createElement('button');
+    button.textContent = 'طلب الشراء';
+    button.onclick = function() {
+        const phoneNumber = doc.getElementById('purchasePhone').value.trim();
+        if (!phoneNumber) { alert(' يرجى إدخال رقم الهاتف مع العلم سعر النسخة 200جنيه مدي الحياة'); return; }
+        const supportNumber = '0201000072951';
+        const message = 'طلب شراء النسخة الدائمة - رقم العميل: ' + phoneNumber;
+        const whatsappURL = 'https://wa.me/' + supportNumber + '?text=' + encodeURIComponent(message);
+        window.open(whatsappURL, '_blank');
+        alert('تم إرسال طلبك للدعم الفني، جاري تحويلك للدعم الفني ');
+    };
+
+    body.appendChild(h2);
+    body.appendChild(input);
+    body.appendChild(button);
+    html.appendChild(head);
+    html.appendChild(body);
+    doc.appendChild(html);
+    doc.close();
+}
+function requestOTP() {
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    if (!phoneNumber) {
+        showToast('يرجى إدخال رقم الهاتف أولاً', 'error');
+        return;
+    }
+
+    // جلب سجل التجارب من localStorage
+    let trialCounts = JSON.parse(localStorage.getItem('trialCounts') || '{}');
+    const trialCount = trialCounts[phoneNumber] || 0;
+
+    if (trialCount >= 2) {
+        showToast('لقد استنفدت مرات التجربة لهذا الرقم، تواصل مع الدعم الفني لشراء النسخة', 'error');
+        return;
+    }
+
+    const otpTimestamp = sessionStorage.getItem('otpTimestamp');
+    const isOTPExtant = otpTimestamp && (Date.now() - parseInt(otpTimestamp) < 86400000);
+    let newOTP;
+
+    if (!isOTPExtant) {
+        newOTP = generateCode();
+        sessionStorage.setItem('trialPhone', phoneNumber);
+        sessionStorage.setItem('trialOTP', newOTP);
+        sessionStorage.setItem('otpTimestamp', Date.now().toString());
+
+        // زيادة عدد التجارب لهذا الرقم وحفظه
+        trialCounts[phoneNumber] = trialCount + 1;
+        localStorage.setItem('trialCounts', JSON.stringify(trialCounts));
+    } else {
+        newOTP = sessionStorage.getItem('trialOTP');
+    }
+
+    document.getElementById('otpInput').value = newOTP;
+    showToast('تم توليد رمز OTP بنجاح', 'success');
+}
+     function formatAmount(input) {
+            let value = input.value.replace(/[^0-9.]/g, '');
+            const parts = value.split('.');
+            let integerPart = parts[0];
+            const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            input.value = integerPart + decimalPart;
+        }
+      // حذف جميع الإشعارات
+function deleteAllNotifications() {
+    if (notifications.length === 0) {
+        showToast('لا توجد إشعارات لحذفها', 'info');
+        return;
+    }
+    if (confirm('هل أنت متأكد من حذف جميع الإشعارات؟')) {
+        notifications = []; // إفراغ المصفوفة
+        localStorage.setItem('notifications', JSON.stringify(notifications)); // تحديث localStorage
+        updateNotifications(); // تحديث الواجهة
+        showToast('تم حذف جميع الإشعارات', 'success');
+    }
+}
+           function toggleLockSettings() {
+    const lockSettings = document.getElementById('lockSettings');
+    lockSettings.style.display = lockSettings.style.display === 'none' ? 'block' : 'none';
+}
+
+document.getElementById('enableLock').addEventListener('change', function() {
+    localStorage.setItem('lockEnabled', this.checked);
+    if (!this.checked) {
+        localStorage.removeItem('appPin');
+        showToast('تم تعطيل قفل التطبيق', 'success');
+    } else {
+        showToast('تم تفعيل قفل التطبيق، يرجى العلم انك مطالب في كل مره تسجيل الدخول ', 'success');
+    }
+});
+
+
+     // التحقق من القفل عند التحميل
+async function checkAppLock() {
+    const savedPhone = localStorage.getItem('phoneNumber');
+    const encryptedPassword = localStorage.getItem('savedPassword');
+    const lockEnabled = localStorage.getItem('lockEnabled') === 'true';
+
+    if (!lockEnabled && savedPhone && encryptedPassword) {
+        try {
+            const savedPassword = CryptoJS.AES.decrypt(encryptedPassword, 'bnb-secret-key-2025').toString(CryptoJS.enc.Utf8);
+            if (savedPassword) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.querySelector('.sidebar-toggle').style.display = 'flex';
+                document.getElementById('userInfo').textContent = `مستخدم بريميوم: ${savedPhone}`;
+                document.getElementById('userInfo').style.color = '#FFD700';
+                addNotification('تم تسجيل الدخول تلقائيًا كعميل بريميوم');
+                await loadMainApp();
+            }
+        } catch (error) {
+            showToast('خطأ في فك تشفير كلمة المرور، قد تكون البيانات تالفة', 'error');
+            console.error('Decryption error:', error);
+        }
+    } else {
+        document.getElementById('loginContainer').style.display = 'flex';
+    }
+}
+// متابعة بعد فتح القفل
+async function proceedAfterUnlock() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    document.querySelector('.sidebar-toggle').style.display = 'flex';
+    const savedPhone = localStorage.getItem('phoneNumber');
+    document.getElementById('userInfo').textContent = `مستخدم: ${savedPhone}`;
+    addNotification('تم فتح التطبيق بنجاح');
+    await loadMainApp();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('1. بدء تهيئة التطبيق');
+    document.body.style.opacity = '0';
+    setTimeout(() => document.body.style.opacity = '1', 100);
+
+    try {
+        console.log('2. فتح قاعدة البيانات');
+        await openDB();
+        console.log('3. تحميل العملاء');
+        await loadClientsFromStorage();
+        console.log('4. تحديث قائمة العملاء');
+        updateClientsList();
+        console.log('5. التحقق من القفل');
+        await checkAppLock();
+        console.log('6. ضبط حالة القفل');
+        document.getElementById('enableLock').checked = localStorage.getItem('lockEnabled') === 'true';
+        console.log('7. اكتمال التهيئة');
+    } catch (error) {
+        console.error('خطأ في التهيئة:', error);
+        showToast('خطأ أثناء تهيئة التطبيق: ' + error.message, 'error');
+        document.getElementById('loginContainer').style.display = 'flex';
+        document.getElementById('mainContent').style.display = 'none';
+        document.querySelector('.sidebar-toggle').style.display = 'none';
+    }
+});
+
+window.addEventListener('beforeunload', async () => {
+    try {
+        await saveClientsToStorage();
+        console.log('تم حفظ البيانات قبل الإغلاق');
+    } catch (error) {
+        console.error('خطأ في الحفظ قبل الإغلاق:', error);
+    }
+});
+        function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, { keyPath: "id" });
+            }
+        };
+        request.onsuccess = event => {
+            db = event.target.result;
+            console.log('تم فتح قاعدة البيانات بنجاح');
+            resolve(db);
+        };
+        request.onerror = event => {
+            console.error('فشل فتح قاعدة البيانات:', event.target.error);
+            showToast('خطأ في فتح قاعدة البيانات', 'error');
+            reject(event.target.error);
+        };
+    });
+}
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        const debouncedSaveClients = debounce(saveClientsToStorage, 500);
+
+        function saveClientsToStorage() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], "readwrite");
+                const store = transaction.objectStore(storeName);
+                const clearRequest = store.clear();
+                clearRequest.onsuccess = () => {
+                    clients.forEach(client => store.put(client));
+                    resolve();
+                };
+                clearRequest.onerror = () => reject(clearRequest.error);
+            });
+        }
+async function deleteClient(clientId) {
+    const client = clients.find(c => c.id === parseInt(clientId));
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    // طلب تأكيد من المستخدم
+    if (confirm(`هل أنت متأكد من حذف العميل "${client.name}" وجميع معاملاته؟`)) {
+        // حذف العميل من المصفوفة
+        const clientIndex = clients.findIndex(c => c.id === parseInt(clientId));
+        clients.splice(clientIndex, 1);
+
+        // تحديث قاعدة البيانات IndexedDB
+        await debouncedSaveClients();
+
+        // تحديث واجهة العميل
+        updateClientsList();
+        showToast(`تم حذف العميل "${client.name}" بنجاح!`, 'success');
+        playNotificationSound('delete');
+    }
+}
+async function loadMainApp() {
+    const encryptedPassword = localStorage.getItem('savedPassword');
+    if (encryptedPassword) {
+        await loadClientsFromStorage(); // تحميل العملاء من IndexedDB
+        updateClientsList(); // تحديث واجهة العملاء
+        console.log('تحميل بيانات العملاء للبريميوم');
+    } else {
+        console.log('وضع التجربة: بيانات العملاء غير متاحة');
+    }
+}
+      function collectPayment(clientId) {
+    const client = clients.find(c => c.id === clientId);
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    // تحديد نوع الدين بناءً على totalAmount
+    const debtType = client.totalAmount >= 0 ? 'toMe' : 'fromMe';
+
+    // عرض اسم العميل
+    document.getElementById('paymentClientName').textContent = client.name;
+    // تخزين معرف العميل ونوع الدين
+    document.getElementById('paymentClientId').value = clientId;
+    document.getElementById('paymentDebtType').value = debtType;
+    // عرض الحد الأقصى للتحصيل
+    const maxPayable = Math.abs(client.totalAmount);
+    document.getElementById('maxPaymentAmount').textContent = formatNumber(maxPayable) + (debtType === 'toMe' ? ' (ليا)' : ' (عليا)');
+
+    // إعادة تعيين النموذج
+    document.getElementById('paymentForm').reset();
+
+    const modal = new bootstrap.Modal(document.getElementById('collectPaymentModal'));
+    modal.show();
+}
+
+       function loadClientsFromStorage() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([storeName], "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        request.onsuccess = event => {
+            clients = event.target.result.map(client => ({
+                ...client,
+                isPinned: client.isPinned || false,
+                transactions: client.transactions.map(t => ({
+                    ...t,
+                    notified: t.notified !== undefined ? t.notified : false
+                }))
+            }));
+            console.log('تم تحميل العملاء:', clients);
+            resolve(clients);
+        };
+        request.onerror = event => {
+            console.error('فشل التحميل:', event.target.error);
+            reject(event.target.error);
+        };
+    });
+}
+
+        let toastQueue = [];
+        let isShowingToast = false;
+
+        function showToast(message, type = 'success') {
+            toastQueue.push({ message, type });
+            processToastQueue();
+        }
+
+        function processToastQueue() {
+            if (isShowingToast || toastQueue.length === 0) return;
+
+            isShowingToast = true;
+            const { message, type } = toastQueue.shift();
+
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} show`;
+            toast.innerHTML = `<i class="${type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i><span>${message}</span>`;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.remove();
+                    isShowingToast = false;
+                    processToastQueue();
+                }, 300);
+            }, 3000);
+        }
+
+        function playNotificationSound(type) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+                case 'startup':
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                case 'delete':
+                    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.15);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.15);
+                    break;
+                case 'collect':
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(900, audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+                case 'export':
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.12);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.12);
+                    break;
+            }
+        }
+// متغير لتتبع آخر نسخ احتياطي
+let lastBackupDate = localStorage.getItem('lastBackupDate') || null;
+
+function scheduleDailyBackup() {
+    setInterval(() => {
+        const now = new Date();
+        const currentDate = now.toISOString().split('T')[0]; // تاريخ اليوم (YYYY-MM-DD)
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        // التحقق مما إذا كان الوقت 12:00 صباحًا (00:00)
+        if (currentHour === 0 && currentMinute === 0) {
+            // التحقق من أن النسخ الاحتياطي لم يتم اليوم بعد
+            if (lastBackupDate !== currentDate) {
+                backupData().then(() => {
+                    lastBackupDate = currentDate;
+                    localStorage.setItem('lastBackupDate', currentDate);
+                    addNotification('تم إجراء نسخ احتياطي تلقائي بنجاح في الساعة 12:00 صباحًا');
+                }).catch(error => {
+                    console.error('فشل النسخ الاحتياطي التلقائي:', error);
+                    addNotification('فشل النسخ الاحتياطي التلقائي: ' + error.message, 'error');
+                });
+            }
+        }
+    }, 60000); // التحقق كل دقيقة (60000 مللي ثانية)
+}
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => document.body.style.opacity = '1', 100);
+
+            try {
+                await openDB();
+
+                const savedPhone = localStorage.getItem('phoneNumber');
+                const savedPassword = localStorage.getItem('password');
+
+                if (savedPhone && savedPassword && validPasswords.includes(savedPassword)) {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.querySelector('.sidebar-toggle').style.display = 'flex';
+                    document.getElementById('userInfo').textContent = `مستخدم: ${savedPhone}`;
+                    addNotification('تم تسجيل الدخول تلقائيًا');
+                    await loadMainApp();
+                } else {
+                    document.getElementById('loginContainer').style.display = 'flex';
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.querySelector('.sidebar-toggle').style.display = 'none';
+                }
+            } catch (error) {
+                showToast('خطأ أثناء تهيئة التطبيق: ' + error.message, 'error');
+            }
+        });
+
+      async function loadMainApp() {
+    console.log('بدء تحميل التطبيق...');
+    // تعليق تحميل IndexedDB مؤقتًا
+    // await loadClientsFromStorage();
+    console.log('البيانات بعد تحميل IndexedDB (معطل مؤقتًا):', clients);
+
+    const restoredData = localStorage.getItem('restoredData');
+    if (restoredData) {
+        const parsedData = JSON.parse(restoredData);
+        clients = [...parsedData.clients];
+        notifications = parsedData.notifications;
+        if (parsedData.theme) localStorage.setItem('theme', parsedData.theme);
+        if (parsedData.phoneNumber) localStorage.setItem('phoneNumber', parsedData.phoneNumber);
+        if (parsedData.password) localStorage.setItem('password', parsedData.password);
+        localStorage.removeItem('restoredData');
+        console.log('البيانات المستعادة من localStorage:', clients);
+    }
+
+    await debouncedSaveClients();
+    console.log('البيانات بعد حفظ IndexedDB:', clients);
+    updateClientsList();
+    updateNotifications();
+    setupSearch();
+    checkDueDates();
+    setInterval(checkDueDates, 60000);
+    initializeThemeSwitcher();
+    console.log('انتهاء تحميل التطبيق، clients حالي:', clients);
+}
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function setupSidebarCloseOnOutsideClick() {
+            document.addEventListener('click', (event) => {
+                const sidebar = document.getElementById('sidebar');
+                const toggleButton = document.querySelector('.sidebar-toggle');
+                const closeButton = document.querySelector('.sidebar-close');
+                if (sidebar.classList.contains('active') &&
+                    !sidebar.contains(event.target) &&
+                    !toggleButton.contains(event.target) &&
+                    !closeButton.contains(event.target)) {
+                    toggleSidebar();
+                }
+            });
+        }
+
+        function formatDateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+            const formattedHours = hours % 12 || 12;
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const date = now.toISOString().split('T')[0];
+            return `${date} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        function showAddClientModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addClientModal'));
+            modal.show();
+        }
+
+        async function saveClient(debtType) {
+            const name = document.getElementById('clientName').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value.replace(/,/g, ''));
+            const description = document.getElementById('description').value.trim();
+            const dueDate = document.getElementById('dueDate').value || null;
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
+
+            if (!name || isNaN(amount) || amount < 0 || !description) {
+                showToast('يرجى ملء جميع الحقول الإلزامية بقيم صحيحة', 'error');
+                return;
+            }
+
+            const existingClient = clients.find(c => c.name.toLowerCase() === name.toLowerCase());
+            if (existingClient) {
+                const confirmAdd = confirm('هذا العميل موجود بالفعل. هل تريد إضافة معاملة جديدة؟');
+                if (confirmAdd) {
+                    existingClient.totalAmount += debtType === 'toMe' ? amount : -amount;
+                    existingClient.transactions.push({ amount, description, debtType, dueDate, date: formatDateTime() });
+                    await debouncedSaveClients();
+                    updateClientsList();
+                    showToast('تمت إضافة المعاملة بنجاح!', 'success');
+                    playNotificationSound('success');
+                }
+                modal.hide();
+                document.getElementById('clientForm').reset();
+                return;
+            }
+
+            const client = {
+                id: Date.now(),
+                name,
+                totalAmount: debtType === 'toMe' ? amount : -amount,
+                transactions: [{ amount, description, debtType, dueDate, date: formatDateTime() }],
+                isPinned: false
+            };
+
+            clients.push(client);
+            await debouncedSaveClients();
+            updateClientsList();
+            showToast('تمت إضافة العميل بنجاح!', 'success');
+            playNotificationSound('success');
+            modal.hide();
+            document.getElementById('clientForm').reset();
+        }
+
+        function shareClient(clientId) {
+    const client = clients.find(c => c.id === clientId);
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    // إعداد رسالة التذكير مع جميع المعاملات
+    let message = `مرحبًا ${client.name}، هذا تذكير بتفاصيل معاملاتك معي:\n\n`;
+    client.transactions.forEach((transaction, index) => {
+        const dueDateText = transaction.dueDate 
+            ? `موعد السداد: ${new Date(transaction.dueDate).toLocaleString('ar-EG')}` 
+            : 'موعد السداد: غير محدد';
+        message += `المعاملة ${index + 1}:\n`;
+        message += `- المبلغ: ${formatNumber(transaction.amount)} جنيه\n`;
+        message += `- الوصف: ${transaction.description}\n`;
+        message += `- النوع: ${transaction.debtType === 'toMe' ? 'مستحق لي' : 'مستحق علي'}\n`;
+        message += `- التاريخ: ${transaction.date}\n`;
+        message += `- ${dueDateText}\n\n`;
+    });
+
+    const totalLabel = client.totalAmount >= 0 ? 'مستحق لي' : 'مستحق علي';
+    message += `إجمالي المديونية: ${formatNumber(Math.abs(client.totalAmount))} جنيه (${totalLabel})\n`;
+    message += `برجاء مراجعة المعاملات والسداد في أقرب وقت إذا لزم الأمر. شكرًا!`;
+
+    // إرسال الرسالة عبر واتساب
+    const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+    window.location.href = whatsappUrl;
+
+    // التحقق مما إذا تم فتح واتساب أم لا
+    setTimeout(() => {
+        if (document.hidden) return;
+        showToast('لم يتم العثور على واتساب!', 'error');
+    }, 1500);
+
+    // عرض إشعار بنجاح إرسال التذكير
+    showToast(`تم إرسال تذكير لـ ${client.name} بنجاح!`, 'success');
+}
+        function copyShareMessage() {
+            const shareMessage = document.getElementById('shareMessage');
+            shareMessage.select();
+            document.execCommand('copy');
+            showToast('تم نسخ الرسالة بنجاح!', 'success');
+        }
+
+        function shareMessage(encodedMessage) {
+            const message = decodeURIComponent(encodedMessage);
+            const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+            window.location.href = whatsappUrl;
+            setTimeout(() => {
+                if (document.hidden) return;
+                showToast('لم يتم العثور على واتساب!', 'error');
+            }, 1500);
+        }
+
+        function addTransaction(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            document.getElementById('addTransactionClientName').textContent = client.name;
+            document.getElementById('transactionClientId').value = clientId;
+            document.getElementById('transactionForm').reset();
+            const modal = new bootstrap.Modal(document.getElementById('addTransactionModal'));
+            modal.show();
+        }
+
+        async function saveTransaction(debtType) {
+            const clientId = parseInt(document.getElementById('transactionClientId').value);
+            const amount = parseFloat(document.getElementById('transactionAmount').value.replace(/,/g, ''));
+            const description = document.getElementById('transactionDescription').value;
+            const dueDate = document.getElementById('transactionDueDate').value || null;
+            const client = clients.find(c => c.id === clientId);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+
+            if (!amount || !description || amount < 0) {
+                showToast('يرجى ملء جميع الحقول الإلزامية بقيم صحيحة', 'error');
+                return;
+            }
+
+            client.totalAmount += debtType === 'toMe' ? amount : -amount;
+            client.transactions.push({ amount, description, debtType, dueDate, date: formatDateTime() });
+            await debouncedSaveClients();
+            updateClientsList();
+            showToast('تمت إضافة المعاملة بنجاح!', 'success');
+            playNotificationSound('success');
+            modal.hide();
+        }
+       function setupDragAndDrop() {
+    const cards = document.querySelectorAll('.client-card');
+    let draggedItem = null;
+
+    cards.forEach(card => {
+        card.addEventListener('dragstart', () => {
+            draggedItem = card;
+            setTimeout(() => {
+                card.style.opacity = '0.4';
+            }, 0);
+        });
+
+        card.addEventListener('dragend', () => {
+            draggedItem.style.opacity = '1';
+            draggedItem = null;
+        });
+
+        card.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        card.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (draggedItem !== card) {
+                const draggedIndex = Array.from(cards).indexOf(draggedItem);
+                const targetIndex = Array.from(cards).indexOf(card);
+                const [movedClient] = clients.splice(draggedIndex, 1);
+                clients.splice(targetIndex, 0, movedClient);
+                updateClientsList();
+                saveClientsToStorage();
+            }
+        });
+    });
+}
+        async function savePayment() {
+    const clientId = parseInt(document.getElementById('paymentClientId').value);
+    const debtType = document.getElementById('paymentDebtType').value;
+    const amount = parseFloat(document.getElementById('paymentAmount').value.replace(/,/g, ''));
+    const description = document.getElementById('paymentDescription').value.trim();
+    const client = clients.find(c => c.id === clientId);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('collectPaymentModal'));
+
+    // التحقق من المدخلات
+    if (!amount || amount <= 0) {
+        showToast('يرجى إدخال مبلغ صالح أكبر من صفر', 'error');
+        return;
+    }
+    if (!description) {
+        showToast('يرجى إدخال وصف للدفعة', 'error');
+        return;
+    }
+
+    const maxPayable = Math.abs(client.totalAmount);
+    const isOverPayment = amount > maxPayable;
+
+    // تأكيد من المستخدم إذا كان المبلغ أكبر من المديونية
+    if (isOverPayment) {
+        const confirmMessage = `المبلغ (${formatNumber(amount)}) أكبر من المديونية (${formatNumber(maxPayable)}). هل تريد المتابعة؟ سيتم تسجيل الفائض كدين عكسي.`;
+        if (!confirm(confirmMessage)) {
+            showToast('تم إلغاء التحصيل', 'warning');
+            return;
+        }
+    }
+
+    // تحديث الرصيد بناءً على نوع الدين
+    if (debtType === 'toMe') {
+        // الدين "ليا": المستخدم يحصل المبلغ من العميل
+        const remainingDebt = client.totalAmount - amount;
+        client.transactions.push({
+            amount: -amount, // المبلغ سالب لأنه تحصيل
+            description: description || 'تحصيل دفعة',
+            debtType: 'toMe',
+            date: formatDateTime()
+        });
+
+        if (isOverPayment) {
+            // إذا كان هناك فائض، أضف معاملة جديدة كدين "عليا"
+            const excess = amount - maxPayable;
+            client.totalAmount = 0; // تصفية الدين الأصلي
+            client.transactions.push({
+                amount: excess, // المبلغ موجب لأنه دين جديد "عليا"
+                description: `فائض دفعة (${formatNumber(excess)}) مستحق عليا`,
+                debtType: 'fromMe',
+                date: formatDateTime()
+            });
+            client.totalAmount += excess; // تحديث الرصيد بالفائض
+        } else {
+            client.totalAmount = remainingDebt; // تحديث الرصيد
+        }
+
+        // إعادة تعيين notified للمعاملات المتأخرة إذا تم تسوية المبلغ
+        client.transactions.forEach(t => {
+            if (t.dueDate && client.totalAmount <= 0) t.notified = false;
+        });
+        showToast(`تم تحصيل ${formatNumber(amount)} من ${client.name} بنجاح!${isOverPayment ? ` (الفائض: ${formatNumber(amount - maxPayable)} مستحق عليك)` : ''}`, 'success');
+
+    } else if (debtType === 'fromMe') {
+        // الدين "عليا": المستخدم يسدد المبلغ للعميل
+        const remainingDebt = client.totalAmount + amount;
+        client.transactions.push({
+            amount: amount, // المبلغ موجب لأنه سداد
+            description: description || 'سداد دفعة مستحقة عليا',
+            debtType: 'fromMe',
+            date: formatDateTime()
+        });
+
+        if (isOverPayment) {
+            // إذا كان هناك فائض، أضف معاملة جديدة كدين "ليا"
+            const excess = amount - maxPayable;
+            client.totalAmount = 0; // تصفية الدين الأصلي
+            client.transactions.push({
+                amount: excess, // المبلغ موجب لأنه دين جديد "ليا"
+                description: `فائض دفعة (${formatNumber(excess)}) مستحق ليا`,
+                debtType: 'toMe',
+                date: formatDateTime()
+            });
+            client.totalAmount += excess; // تحديث الرصيد بالفائض
+        } else {
+            client.totalAmount = remainingDebt; // تحديث الرصيد
+        }
+
+        client.transactions.forEach(t => {
+            if (t.dueDate && client.totalAmount >= 0) t.notified = false;
+        });
+        showToast(`تم سداد ${formatNumber(amount)} لـ ${client.name} بنجاح!${isOverPayment ? ` (الفائض: ${formatNumber(amount - maxPayable)} مستحق لك)` : ''}`, 'success');
+    }
+
+    // إضافة إشعار
+    addNotification(`تم تحصيل ${formatNumber(amount)} من ${client.name}${isOverPayment ? ` (الفائض: ${formatNumber(amount - maxPayable)} ${debtType === 'toMe' ? 'مستحق عليك' : 'مستحق لك'})` : ''}`, 'payment', client.id, amount, debtType);
+
+    // حفظ التغييرات
+    await debouncedSaveClients();
+    updateClientsList();
+    playNotificationSound('collect');
+    modal.hide();
+}
+        function exportToExcel(clientId) {
+    const client = clients.find(c => c.id === clientId);
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    const reportElement = document.createElement('div');
+    reportElement.style.position = 'absolute';
+    reportElement.style.left = '-9999px';
+    reportElement.style.width = '90%';
+    reportElement.style.maxWidth = '600px';
+    reportElement.style.padding = '15px';
+    reportElement.style.backgroundColor = '#ffffff';
+    reportElement.style.fontFamily = "'Cairo', sans-serif";
+    reportElement.style.direction = 'rtl';
+    reportElement.style.border = '2px solid #1e40af';
+    reportElement.style.borderRadius = '12px';
+    reportElement.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
+
+    const currentDate = new Date().toLocaleString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+    let runningBalance = 0;
+    const transactionsWithBalance = client.transactions.map((t) => {
+        const balanceBefore = runningBalance;
+        runningBalance += (t.debtType === 'toMe' && t.amount > 0) ? t.amount : -Math.abs(t.amount);
+        return { ...t, balanceBefore, balanceAfter: runningBalance };
+    });
+
+    const totalLabel = client.totalAmount >= 0 ? 'ليا' : 'عليا';
+    const totalColor = client.totalAmount >= 0 ? '#16a34a' : '#dc2626';
+
+    reportElement.innerHTML = `
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h2 style="color: #1e40af; font-size: 20px; font-weight: 700; margin: 0;">كشف حساب العميل: ${client.name}</h2>
+            <p style="color: #64748b; font-size: 12px; margin: 5px 0;">تاريخ الإصدار: ${currentDate}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px;">
+            <thead>
+                <tr style="background: linear-gradient(90deg, #1e40af, #60a5fa); color: white;">
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">التاريخ</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">الوصف</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">النوع</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">المبلغ</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">رصيدك قبل</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">رصيدك بعد</th>
+                    <th style="padding: 10px; border: 1px solid #dbeafe; text-align: right; font-weight: 700;">موعد السداد</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${transactionsWithBalance.map(t => `
+                    <tr style="background-color: ${t.amount < 0 ? '#f0fdf4' : '#ffffff'};">
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right;">${t.date}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right;">${t.description}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right;">${t.debtType === 'toMe' ? 'مستحق ليا' : 'مستحق عليا'}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right; color: ${t.amount < 0 ? '#16a34a' : '#dc2626'}; font-weight: 600;">${formatNumber(t.amount)}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right; color: ${t.balanceBefore >= 0 ? '#dc2626' : '#16a34a'}; font-weight: 600;">${formatNumber(t.balanceBefore)}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right; color: ${t.balanceAfter >= 0 ? '#16a34a' : '#dc2626'}; font-weight: 600;">${formatNumber(t.balanceAfter)}</td>
+                        <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: right;">${t.dueDate ? new Date(t.dueDate).toLocaleString('ar-EG') : 'غير محدد'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <div style="margin-top: 15px; text-align: center; font-size: 14px; font-weight: 700;">
+            <span style="color: #1e293b;">إجمالي المديونية: </span>
+            <span style="color: ${totalColor};">${formatNumber(Math.abs(client.totalAmount))} (${totalLabel})</span>
+        </div>
+        <div style="margin-top: 10px; text-align: center; font-size: 10px; color: #64748b;">
+            تم إنشاء هذا الكشف بواسطة تطبيق "سجل مديونياتك" - للدعم: <a href="https://wa.me/0201000072951" style="color: #1e40af;">0201000072951</a>
+        </div>
+    `;
+
+    document.body.appendChild(reportElement);
+
+    html2canvas(reportElement, { scale: 1.5 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);
+        if (!imgData || imgData === 'data:,') {
+            throw new Error('فشل إنشاء الصورة من canvas');
+        }
+
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '20000';
+
+        const img = document.createElement('img');
+        img.src = imgData;
+        img.style.maxWidth = '85%';
+        img.style.maxHeight = '65%';
+        img.style.objectFit = 'contain';
+        img.style.border = '2px solid #1e40af';
+        img.style.borderRadius = '8px';
+        img.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+        img.onerror = () => showToast('فشل تحميل الصورة', 'error');
+        img.onload = () => console.log('تم تحميل الصورة بنجاح');
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.marginTop = '15px';
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '10px';
+
+        const backButton = document.createElement('button');
+        backButton.textContent = 'رجوع';
+        backButton.style.background = 'linear-gradient(45deg, #dc2626, #f87171)';
+        backButton.style.color = '#fff';
+        backButton.style.border = 'none';
+        backButton.style.padding = '8px 16px';
+        backButton.style.borderRadius = '6px';
+        backButton.style.cursor = 'pointer';
+        backButton.style.fontWeight = '600';
+        backButton.style.transition = 'transform 0.3s ease';
+        backButton.addEventListener('mouseover', () => backButton.style.transform = 'scale(1.05)');
+        backButton.addEventListener('mouseout', () => backButton.style.transform = 'scale(1)');
+        backButton.addEventListener('click', () => document.body.removeChild(overlay));
+
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'حفظ الصورة';
+        saveButton.style.background = 'linear-gradient(45deg, #1e40af, #60a5fa)';
+        saveButton.style.color = '#fff';
+        saveButton.style.border = 'none';
+        saveButton.style.padding = '8px 16px';
+        saveButton.style.borderRadius = '6px';
+        saveButton.style.cursor = 'pointer';
+        saveButton.style.fontWeight = '600';
+        saveButton.style.transition = 'transform 0.3s ease';
+        saveButton.addEventListener('mouseover', () => saveButton.style.transform = 'scale(1.05)');
+        saveButton.addEventListener('mouseout', () => saveButton.style.transform = 'scale(1)');
+        saveButton.addEventListener('click', () => {
+            const fileName = `كشف_حساب_${client.name}_${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`;
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('تم حفظ الصورة بنجاح! قد يستغرق الظهور في التنزيلات بضع دقائق', 'success');
+            playNotificationSound('export');
+            document.body.removeChild(overlay);
+        });
+
+        buttonContainer.appendChild(saveButton);
+        buttonContainer.appendChild(backButton);
+        overlay.appendChild(img);
+        overlay.appendChild(buttonContainer);
+        document.body.appendChild(overlay);
+
+        document.body.removeChild(reportElement);
+        showToast('تم تصدير كشف الحساب بنجاح!', 'success');
+        playNotificationSound('export');
+    }).catch(error => {
+        showToast('حدث خطأ أثناء إنشاء الصورة: ' + error.message, 'error');
+        console.error('html2canvas error:', error);
+        document.body.removeChild(reportElement);
+    });
+}
+
+// دالة مساعدة لتحويل Data URL إلى Blob
+function dataURLtoBlob(dataURL) {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
+
+// دالة احتياطية للمشاركة
+function fallbackShare(imgData, fileName) {
+    const blob = dataURLtoBlob(imgData);
+    const url = URL.createObjectURL(blob);
+    
+    // محاولة فتح WhatsApp مباشرة
+    const whatsappUrl = `whatsapp://send?text=كشف حساب العميل: ${encodeURIComponent(fileName)}%0A${encodeURIComponent(url)}`;
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // إعطاء المستخدم تعليمات إذا لم يعمل WhatsApp
+    setTimeout(() => {
+        showToast('إذا لم يتم فتح WhatsApp، انسخ الرابط يدويًا: ' + url, 'info', 5000);
+    }, 1000);
+
+    // تنظيف URL بعد المشاركة
+    setTimeout(() => URL.revokeObjectURL(url), 30000); // إزالة الرابط بعد 30 ثانية
+}
+        function calculateDebtsSummary() {
+            let owedToMe = 0;
+            let owedFromMe = 0;
+            clients.forEach(client => {
+                if (client.totalAmount > 0) owedToMe += client.totalAmount;
+                else if (client.totalAmount < 0) owedFromMe += Math.abs(client.totalAmount);
+            });
+            return { owedToMe, owedFromMe, netDebt: owedToMe - owedFromMe };
+        }
+
+        function generateSmartReport() {
+            const now = new Date();
+            let tips = [];
+            let overdueClients = 0;
+            const { owedToMe, owedFromMe, netDebt } = calculateDebtsSummary();
+
+            clients.forEach(client => {
+                const lastTransaction = client.transactions[client.transactions.length - 1];
+                const lastDate = new Date(lastTransaction.date.split(' - ')[0]);
+                const daysDiff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+                if (client.totalAmount > 0 && daysDiff > 7) {
+                    overdueClients++;
+                    tips.push({
+                        text: `العميل ${client.name} لم يسدد ${formatNumber(client.totalAmount)} منذ ${daysDiff} أيام.`
+                    });
+                }
+            });
+
+            if (overdueClients > 0) {
+                tips.push({ text: `لديك ${overdueClients} عملاء متأخرين، حاول التواصل معهم.` });
+            } else {
+                tips.push({ text: "لا يوجد عملاء متأخرون حاليًا، استمر في الأداء الممتاز!" });
+            }
+
+            const reportHTML = `
+                <div class="smart-report" style="background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 500px; width: 90%; font-family: 'Cairo', sans-serif; direction: rtl;">
+                    <h3 style="color: #1e40af; text-align: center; font-weight: 700; margin-bottom: 15px;">تقرير ذكي</h3>
+                    <div class="debt-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; text-align: center;">
+                        <div style="background: #f0fdf4; padding: 10px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.05);">
+                            <p style="margin: 0; font-size: 0.9rem; color: #15803d;">ليا</p>
+                            <p style="font-size: 1.1rem; font-weight: 700; color: #16a34a;">${formatNumber(owedToMe)}</p>
+                        </div>
+                        <div style="background: #fef2f2; padding: 10px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.05);">
+                            <p style="margin: 0; font-size: 0.9rem; color: #b91c1c;">عليا</p>
+                            <p style="font-size: 1.1rem; font-weight: 700; color: #dc2626;">${formatNumber(owedFromMe)}</p>
+                        </div>
+                        <div style="background: ${netDebt >= 0 ? '#f0fdf4' : '#fef2f2'}; padding: 10px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.05);">
+                            <p style="margin: 0; font-size: 0.9rem; color: ${netDebt >= 0 ? '#15803d' : '#b91c1c'};">الصافي</p>
+                            <p style="font-size: 1.1rem; font-weight: 700; color: ${netDebt >= 0 ? '#16a34a' : '#dc2626'};">${formatNumber(netDebt)}</p>
+                        </div>
+                    </div>
+                    <h4 style="color: #1e293b; font-weight: 600; margin-bottom: 12px;">نصائح ذكية</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        ${tips.map(tip => `
+                            <li style="margin: 10px 0; padding: 10px; background: #f0fdf4; border-radius: 6px; color: #16a34a;">
+                                <span>${tip.text}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+            showCustomModal(reportHTML);
+            showToast('تم إنشاء التقرير الذكي بنجاح!', 'success');
+            playNotificationSound('success');
+        }
+
+        function showCustomModal(content) {
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.background = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '5000';
+            modal.innerHTML = content;
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            document.body.appendChild(modal);
+        }
+
+      function updateClientsList() {
+    requestAnimationFrame(() => {
+        const clientsList = document.getElementById('clientsList');
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        const filteredClients = clients.filter(client => client.name.toLowerCase().includes(searchQuery));
+        filteredClients.sort((a, b) => b.isPinned - a.isPinned);
+
+        console.log('البيانات المستخدمة في updateClientsList:', filteredClients);
+
+        const { owedToMe, owedFromMe, netDebt } = calculateDebtsSummary();
+
+        clientsList.innerHTML = `
+            <div class="debt-counters" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div class="debt-counter owed-to-me" style="text-align: center;">
+                    <span class="amount">${formatNumber(owedToMe)}</span>
+                    <span class="label">ليا</span>
+                </div>
+                <div class="debt-counter net-debt" style="text-align: center;">
+                    <span class="amount">${formatNumber(Math.abs(netDebt))}</span>
+                    <span class="label">${netDebt >= 0 ? 'صافي ليا' : 'صافي عليا'}</span>
+                </div>
+                <div class="debt-counter owed-from-me" style="text-align: center;">
+                    <span class="amount">${formatNumber(owedFromMe)}</span>
+                    <span class="label">عليا</span>
+                </div>
+            </div>
+        `;
+
+        filteredClients.forEach((client, index) => {
+            const totalColor = client.totalAmount >= 0 ? '#16a34a' : '#dc2626';
+            const totalLabel = client.totalAmount >= 0 ? 'ليا' : 'عليا';
+
+            client.transactions.forEach((t, idx) => {
+                if (!t.id) t.id = `${client.id}-${idx}-${Date.now()}`;
+            });
+
+            const card = document.createElement('div');
+            card.className = `client-card ${client.isPinned ? 'pinned' : ''}`;
+            card.draggable = true;
+            card.dataset.id = client.id;
+
+            card.style.backgroundColor = client.isPinned ? '#dbeafe' : '#ffffff';
+            card.style.borderRadius = '8px';
+            card.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+            card.style.marginBottom = '12px';
+            card.style.transition = 'transform 0.2s ease';
+            card.style.overflow = 'hidden';
+            if (client.isPinned) {
+                card.style.borderLeft = '3px solid #1e40af';
+            } else {
+                card.style.border = '1px solid #e5e7eb';
+            }
+
+            card.innerHTML = `
+                <div class="client-header" style="background: ${client.isPinned ? '#dbeafe' : '#f9fafb'}; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; border-radius: 8px 8px 0 0;">
+                    <div class="client-info" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user" style="color: #64748b; font-size: 1rem;"></i>
+                        <span class="client-name" style="font-size: 1rem; font-weight: 600; color: ${totalColor};">${client.name}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="client-amount" style="font-size: 1.1rem; font-weight: 700; color: ${totalColor};">${formatNumber(Math.abs(client.totalAmount))} ${totalLabel}</span>
+                        <button class="btn btn-sm btn-warning" onclick="togglePin(${client.id})" style="background: ${client.isPinned ? '#1e40af' : '#f59e0b'}; border: none; color: #ffffff; padding: 4px 6px; border-radius: 4px; font-size: 0.9rem;">
+                            <i class="fas ${client.isPinned ? 'fa-thumbtack' : 'fa-thumbtack'}"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteClient(${client.id})" style="background: #dc2626; border: none; color: #ffffff; padding: 4px 6px; border-radius: 4px; font-size: 0.9rem;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="client-details" style="display: none; padding: 10px; background: ${client.isPinned ? '#dbeafe' : '#f9fafb'}; border-radius: 0 0 8px 8px;">
+                   <div class="btn-group-sm" style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;">
+    <button class="btn btn-sm btn-primary" onclick="addTransaction(${client.id})" style="background: #1e40af; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px;">
+        <i class="fas fa-plus-circle me-1"></i> اضافة مبلغ
+    </button>
+    <button class="btn btn-sm btn-success" onclick="collectPayment(${client.id})" style="background: #10b981; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px;">
+        <i class="fas fa-money-bill-wave me-1"></i> تحصيل مبلغ
+    </button>
+    <button class="btn btn-sm btn-secondary" onclick="shareClient(${client.id})" style="background: #64748b; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px;">
+        <i class="fab fa-whatsapp me-1"></i> تذكير
+    </button>
+    <button class="btn btn-sm btn-warning" onclick="exportToExcel(${client.id})" style="background: #f59e0b; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px;">
+        <i class="fas fa-file-export me-1"></i> كشف حساب
+    </button>
+    <!-- زر تعديل الاسم الجديد -->
+    <button class="btn btn-sm btn-info" onclick="editClientName(${client.id})" style="background: #0ea5e9; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px;">
+        <i class="fas fa-edit me-1"></i> تعديل الاسم
+    </button>
+</div>
+                    <div class="transactions-list" style="margin-top: 10px;">
+                        <h6 style="font-size: 0.9rem; font-weight: 600; color: #1e293b;">المعاملات:</h6>
+                        <ul style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto;">
+                            ${client.transactions.map(t => `
+                                <li style="padding: 8px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="flex-grow: 1;">
+                                        <span style="font-weight: 600; color: ${t.debtType === 'toMe' ? '#16a34a' : '#dc2626'};">${formatNumber(t.amount)} (${t.debtType === 'toMe' ? 'ليا' : 'عليا'})</span><br>
+                                        <small style="color: #64748b;">${t.description} - ${t.date}</small>
+                                    </div>
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-sm btn-info" onclick="editTransaction('${client.id}', '${t.id}')" style="background: #0ea5e9; border: none; padding: 4px 6px; border-radius: 4px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteTransaction('${client.id}', '${t.id}')" style="background: #dc2626; border: none; padding: 4px 6px; border-radius: 4px;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.1)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+            });
+
+            clientsList.appendChild(card);
+        });
+
+        document.querySelectorAll('.client-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+                    const card = header.parentElement;
+                    card.classList.toggle('active');
+                    const details = card.querySelector('.client-details');
+                    details.style.display = card.classList.contains('active') ? 'block' : 'none';
+                }
+            });
+        });
+
+        setupDragAndDrop();
+    });
+}
+        async function togglePin(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            client.isPinned = !client.isPinned;
+            await debouncedSaveClients();
+            updateClientsList();
+            showToast(`تم ${client.isPinned ? 'تثبيت' : 'إلغاء تثبيت'} العميل ${client.name}`, 'success');
+        }
+
+       async function deleteTransaction(clientId, transactionId) {
+    const client = clients.find(c => c.id === parseInt(clientId));
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    const transactionIndex = client.transactions.findIndex(t => t.id === transactionId);
+    if (transactionIndex === -1) {
+        showToast('المعاملة غير موجودة!', 'error');
+        return;
+    }
+
+    if (confirm(`هل أنت متأكد من حذف المعاملة: ${client.transactions[transactionIndex].description}؟`)) {
+        const transaction = client.transactions[transactionIndex];
+        // تعديل الإجمالي بناءً على نوع المعاملة
+        client.totalAmount -= transaction.debtType === 'toMe' ? transaction.amount : -transaction.amount;
+        client.transactions.splice(transactionIndex, 1); // حذف المعاملة
+        
+        await debouncedSaveClients();
+        updateClientsList();
+        showToast('تم حذف المعاملة بنجاح!', 'success');
+        playNotificationSound('delete');
+    }
+}
+function editTransaction(clientId, transactionId) {
+    const client = clients.find(c => c.id === parseInt(clientId));
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    const transaction = client.transactions.find(t => t.id === transactionId);
+    if (!transaction) {
+        showToast('المعاملة غير موجودة!', 'error');
+        return;
+    }
+
+    // ملء الحقول بالبيانات الحالية
+    document.getElementById('editTransactionClientName').textContent = client.name;
+    document.getElementById('editTransactionClientId').value = clientId;
+    document.getElementById('editTransactionId').value = transactionId;
+    document.getElementById('editTransactionAmount').value = formatNumber(transaction.amount);
+    document.getElementById('editTransactionDescription').value = transaction.description;
+    document.getElementById('editTransactionDueDate').value = transaction.dueDate || '';
+    
+    // تحديد زر الراديو المناسب
+    document.getElementById('editDebtToMe').checked = transaction.debtType === 'toMe';
+    document.getElementById('editDebtFromMe').checked = transaction.debtType === 'fromMe';
+
+    const modal = new bootstrap.Modal(document.getElementById('editTransactionModal'));
+    modal.show();
+}
+async function saveEditedTransaction() {
+    const clientId = parseInt(document.getElementById('editTransactionClientId').value);
+    const transactionId = document.getElementById('editTransactionId').value;
+    const amount = parseFloat(document.getElementById('editTransactionAmount').value.replace(/,/g, ''));
+    const description = document.getElementById('editTransactionDescription').value.trim();
+    const dueDate = document.getElementById('editTransactionDueDate').value || null;
+    const debtType = document.querySelector('input[name="editDebtType"]:checked')?.value; // لأننا سنستخدم أزرار راديو
+
+    const client = clients.find(c => c.id === clientId);
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    const transactionIndex = client.transactions.findIndex(t => t.id === transactionId);
+    if (transactionIndex === -1) {
+        showToast('المعاملة غير موجودة!', 'error');
+        return;
+    }
+
+    if (!amount || amount < 0 || !description || !debtType) {
+        showToast('يرجى ملء جميع الحقول الإلزامية بقيم صحيحة', 'error');
+        return;
+    }
+
+    const oldTransaction = client.transactions[transactionIndex];
+
+    // طرح القيمة القديمة من الإجمالي بناءً على نوعها الأصلي
+    if (oldTransaction.debtType === 'toMe') {
+        client.totalAmount -= oldTransaction.amount;
+    } else if (oldTransaction.debtType === 'fromMe') {
+        client.totalAmount += oldTransaction.amount; // لأنها كانت سالبة
+    }
+
+    // إضافة القيمة الجديدة بناءً على النوع الجديد
+    if (debtType === 'toMe') {
+        client.totalAmount += amount;
+    } else if (debtType === 'fromMe') {
+        client.totalAmount -= amount;
+    }
+
+    // تحديث المعاملة
+    client.transactions[transactionIndex] = {
+        ...oldTransaction,
+        amount,
+        description,
+        debtType,
+        dueDate,
+        date: oldTransaction.date // الاحتفاظ بالتاريخ الأصلي
+    };
+
+    await debouncedSaveClients();
+    updateClientsList(); // لتحديث العدادات وقائمة العملاء
+    showToast('تم تعديل المعاملة بنجاح!', 'success');
+    playNotificationSound('success');
+    bootstrap.Modal.getInstance(document.getElementById('editTransactionModal')).hide();
+}
+async function editClientName(clientId) {
+    const client = clients.find(c => c.id === clientId);
+    if (!client) {
+        showToast('العميل غير موجود!', 'error');
+        return;
+    }
+
+    // طلب الاسم الجديد من المستخدم
+    const newName = prompt('أدخل الاسم الجديد للعميل:', client.name);
+    if (!newName || newName.trim() === '') {
+        showToast('يرجى إدخال اسم صحيح!', 'error');
+        return;
+    }
+
+    // تحديث اسم العميل
+    client.name = newName.trim();
+    await debouncedSaveClients(); // حفظ التغييرات في قاعدة البيانات
+    updateClientsList(); // تحديث واجهة العملاء
+    showToast(`تم تعديل اسم العميل إلى "${newName}" بنجاح!`, 'success');
+    playNotificationSound('success');
+}
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', debounce(() => updateClientsList(), 300));
+        }
+// دالة تبديل الشريط الجانبي
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+// إغلاق الشريط الجانبي عند النقر خارجه
+document.addEventListener('click', (e) => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+    const sidebarCloseButton = document.querySelector('.sidebar-close');
+
+    // التحقق مما إذا كان الشريط مفتوحًا وما إذا كان النقر خارج الشريط
+    if (sidebar.classList.contains('active')) {
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickOnToggleButton = toggleButton.contains(e.target);
+        const isClickOnCloseButton = sidebarCloseButton && sidebarCloseButton.contains(e.target);
+
+        if (!isClickInsideSidebar && !isClickOnToggleButton && !isClickOnCloseButton) {
+            sidebar.classList.remove('active');
+        }
+    }
+});
+       
+         function markAsRead(index) {
+    if (notifications[index]) {
+        notifications[index].read = true;
+        updateNotifications();
+        playNotificationSound('click');
+        const clientId = notifications[index].clientId;
+        if (clientId) {
+            const clientCard = document.querySelector(`.client-card[data-id="${clientId}"]`);
+            if (clientCard) {
+                clientCard.scrollIntoView({ behavior: 'smooth' });
+                clientCard.classList.add('active');
+                clientCard.querySelector('.client-details').style.display = 'block';
+            }
+        }
+    }
+}
+        function checkDueDates() {
+    const now = new Date();
+    clients.forEach(client => {
+        client.transactions.forEach(t => {
+            if (t.dueDate && !t.notified && new Date(t.dueDate) <= now) {
+                // التحقق من أن المعاملة لم تُسدد بعد (مثلاً، إذا كان المبلغ لا يزال موجوداً في الإجمالي)
+                const isRelevant = (t.debtType === 'toMe' && client.totalAmount > 0) || 
+                                  (t.debtType === 'fromMe' && client.totalAmount < 0);
+                if (isRelevant) {
+                    const message = `موعد سداد ${client.name} قد حان! (${formatNumber(Math.abs(t.amount))} ${t.debtType === 'toMe' ? 'ليا' : 'عليا'})`;
+                    // التحقق من عدم وجود إشعار مكرر
+                    if (!notifications.some(n => n.message === message && !n.read)) {
+                        addNotification(message, 'overdue', client.id, t.amount, t.debtType);
+                    }
+                    t.notified = true; // تعيين حالة الإخطار
+                }
+            }
+        });
+    });
+    debouncedSaveClients(); // حفظ التغييرات في قاعدة البيانات
+    updateNotifications(); // تحديث الإشعارات
+}
+       function updateNotifications() {
+    const notificationsList = document.getElementById('notificationsList');
+    const notificationCount = document.getElementById('notificationCount');
+
+    if (!notificationsList || !notificationCount) {
+        console.error('عنصر notificationsList أو notificationCount غير موجود في DOM');
+        return;
+    }
+
+    notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+    notificationCount.textContent = unreadCount;
+
+    notificationsList.innerHTML = notifications.length > 0
+        ? notifications.map((n, index) => `
+            <li onclick="markAsRead(${index})" class="${n.read ? '' : 'unread'}" style="cursor: pointer; padding: 8px; border-bottom: 1px solid #e5e7eb;">
+                ${n.message}<br><small>${n.timestamp}</small>
+            </li>
+        `).join('')
+        : '<li style="color: #16a34a; text-align: center; padding: 8px;">لا توجد إشعارات</li>';
+
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+}
+     function toggleNotifications() {
+    const dropdown = document.getElementById('notificationsDropdown');
+    const isOpening = dropdown.style.display === 'none';
+    dropdown.style.display = isOpening ? 'block' : 'none';
+
+    // لا يتم تغيير حالة الإشعارات تلقائيًا عند الفتح
+    // فقط تحديث الإشعارات لضمان التمييز الصحيح
+    updateNotifications();
+}
+
+        function toggleColorPicker() {
+            const colorOptions = document.getElementById('colorOptions');
+            colorOptions.style.display = colorOptions.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function initializeThemeSwitcher() {
+            const colorOptions = document.querySelectorAll('.color-option');
+            const savedTheme = localStorage.getItem('theme') || 'blue';
+            document.body.className = `theme-${savedTheme}`;
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const theme = option.dataset.color;
+                    document.body.className = `theme-${theme}`;
+                    localStorage.setItem('theme', theme);
+                    toggleColorPicker();
+                    showToast('تم تغيير الثيم بنجاح!', 'success');
+                });
+            });
+        }
+
+      
+
+        function confirmSupport() {
+            const confirmContact = confirm('هل تريد التواصل مع الدعم الفني عبر واتساب؟');
+            if (confirmContact) {
+                window.open('https://wa.me/0201000072951', '_blank');
+            }
+        }
+
+      // دالة لإنشاء معرف مستخدم فريد بناءً على رقم الهاتف
+function generateUserId(phoneNumber) {
+    return phoneNumber.replace(/[^0-9]/g, ''); // إزالة أي أحرف غير أرقام
+}
+
+// دالة النسخ الاحتياطي إلى السيرفر
+async function backupData() {
+    const phoneNumber = localStorage.getItem('phoneNumber');
+    if (!phoneNumber) {
+        showToast('للخطة المدفوعة فقط برجاء شراء النسخة لفتح جميع المزايا!', 'error');
+        return;
+    }
+
+    const userId = generateUserId(phoneNumber);
+    const backup = {
+        clients,
+        notifications,
+        theme: localStorage.getItem('theme'),
+        phoneNumber: localStorage.getItem('phoneNumber'),
+        password: localStorage.getItem('password')
+    };
+
+    console.log('البيانات المرسلة للنسخ:', backup);
+    console.log('userId المستخدم:', userId);
+
+    try {
+        const response = await fetch('http://62.72.63.107:3000/backup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: userId,
+                data: backup
+            })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            showToast(result.message || 'تم حفظ النسخة الاحتياطية بنجاح على السيرفر!', 'success');
+            playNotificationSound('export');
+            // إضافة إشعار للنسخة الاحتياطية
+            addNotification('تم إنشاء نسخة احتياطية بنجاح', 'backup');
+        } else {
+            throw new Error(result.message || 'فشل حفظ النسخة الاحتياطية');
+        }
+    } catch (error) {
+        if (error.message.includes('Failed to fetch')) {
+            showToast('لا يمكن الاتصال بالسيرفر. تحقق من الاتصال بالإنترنت أو حالة السيرفر.', 'error');
+        } else if (error.message.includes('CORS')) {
+            showToast('خطأ في إعدادات السيرفر (CORS). تواصل مع الدعم الفني.', 'error');
+        } else {
+            showToast('خطأ أثناء حفظ النسخة الاحتياطية: ' + error.message, 'error');
+        }
+        console.error('Backup error:', error);
+    }
+}
+// دالة استعادة البيانات من السيرفر
+async function restoreData() {
+    const phoneNumber = localStorage.getItem('phoneNumber');
+    if (!phoneNumber) {
+        showToast('للخطة المدفوعة فقط برجاء شراء النسخة لفتح جميع المزايا!', 'error');
+        return;
+    }
+
+    const userId = generateUserId(phoneNumber);
+    console.log('userId المستخدم للاستعادة:', userId);
+
+    try {
+        const response = await fetch(`http://62.72.63.107:3000/restore/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        console.log('البيانات الخام المسترجعة من السيرفر:', result);
+
+        if (response.ok) {
+            if (result.message === 'لا توجد نسخة احتياطية') {
+                showToast('لا توجد نسخة احتياطية لاستعادتها!', 'error');
+                return;
+            }
+
+            const restoredData = {
+                clients: result.clients || [],
+                notifications: result.notifications || [],
+                theme: result.theme,
+                phoneNumber: result.phoneNumber,
+                password: result.password
+            };
+            console.log('البيانات المُعدلة للاستعادة:', restoredData);
+            localStorage.setItem('restoredData', JSON.stringify(restoredData));
+
+            clients = [...restoredData.clients];
+            console.log('clients بعد الاستعادة مباشرة:', clients);
+            notifications = restoredData.notifications;
+            if (restoredData.theme) localStorage.setItem('theme', restoredData.theme);
+            if (restoredData.phoneNumber) localStorage.setItem('phoneNumber', restoredData.phoneNumber);
+            if (restoredData.password) localStorage.setItem('password', restoredData.password);
+
+            await debouncedSaveClients();
+            console.log('clients بعد حفظ IndexedDB:', clients);
+
+            updateClientsList();
+            updateNotifications();
+
+            showToast('تم استعادة البيانات بنجاح من السيرفر!', 'success');
+            playNotificationSound('success');
+            // إضافة إشعار للاستعادة
+            addNotification('تم استعادة النسخة بنجاح', 'restore');
+        } else {
+            throw new Error(result.message || 'فشل استعادة البيانات');
+        }
+    } catch (error) {
+        showToast('خطأ أثناء استعادة البيانات: ' + error.message, 'error');
+        console.error('Restore error:', error);
+    }
+}
+        const validPasswords = ['AD500', 'AS400', '600540'];
+
+  async function handleLogin(mode) {
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const passwordInput = document.getElementById('password').value.trim();
+
+    if (!phoneNumber || !passwordInput) {
+        showToast('يرجى إدخال رقم الهاتف وكلمة المرور', 'error');
+        return;
+    }
+
+    const savedPhone = localStorage.getItem('phoneNumber');
+    const encryptedPassword = localStorage.getItem('savedPassword');
+    let savedPassword = "";
+    if (encryptedPassword) {
+        try {
+            savedPassword = CryptoJS.AES.decrypt(encryptedPassword, 'bnb-secret-key-2025').toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            showToast('خطأ في فك تشفير كلمة المرور، قد تكون البيانات تالفة', 'error');
+            console.error('Decryption error:', error);
+            return;
+        }
+    }
+
+    // إذا كانت كلمة المرور محفوظة، نقارن مع المدخل
+    if (savedPassword) {
+        if (phoneNumber === savedPhone && passwordInput === savedPassword) {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.querySelector('.sidebar-toggle').style.display = 'flex';
+            document.getElementById('userInfo').textContent = `مستخدم بريميوم: ${phoneNumber}`;
+            document.getElementById('userInfo').style.color = '#FFD700';
+            addNotification('تم تسجيل الدخول كعميل بريميوم');
+            await loadMainApp();
+        } else {
+            showToast('رقم الهاتف أو كلمة المرور غير صحيحة', 'error');
+        }
+    }
+    // إذا لم يكن هناك كلمة مرور محفوظة، نقبل كلمة المرور من القائمة الافتراضية
+    else if (validPasswords.includes(passwordInput)) {
+        const encryptedNewPassword = CryptoJS.AES.encrypt(passwordInput, 'bnb-secret-key-2025').toString();
+        localStorage.setItem('phoneNumber', phoneNumber);
+        localStorage.setItem('savedPassword', encryptedNewPassword);
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.querySelector('.sidebar-toggle').style.display = 'flex';
+        document.getElementById('userInfo').textContent = `مستخدم بريميوم: ${phoneNumber}`;
+        document.getElementById('userInfo').style.color = '#FFD700';
+        addNotification('تم تسجيل الدخول كعميل بريميوم');
+        await loadMainApp();
+    } else {
+        showToast('كلمة المرور غير صحيحة', 'error');
+    }
+}
+
+function logout() {
+    // إزالة بيانات تسجيل الدخول من localStorage
+    localStorage.removeItem('phoneNumber');
+    localStorage.removeItem('savedPassword');
+    
+    // إعادة تعيين الواجهة
+    document.getElementById('loginContainer').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
+    document.querySelector('.sidebar-toggle').style.display = 'none';
+    document.getElementById('userInfo').textContent = '';
+    
+    // إعادة تعيين حقول الإدخال
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('password').value = '';
+    
+    // عرض إشعار
+    showToast('تم تسجيل الخروج بنجاح', 'success');
+    addNotification('تم تسجيل الخروج', 'logout');
+}
+function exportToJson() {
+    const backup = {
+        clients,
+        notifications,
+        theme: localStorage.getItem('theme'),
+        phoneNumber: localStorage.getItem('phoneNumber'),
+        password: localStorage.getItem('savedPassword')
+    };
+
+    const jsonStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const fileName = `backup_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('تم تصدير البيانات إلى ملف JSON بنجاح!', 'success');
+    playNotificationSound('export');
+    addNotification('تم إنشاء نسخة احتياطية بصيغة JSON', 'backup');
+}
+
+function importFromJson(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        showToast('يرجى اختيار ملف JSON', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredData = JSON.parse(e.target.result);
+            if (!restoredData.clients || !Array.isArray(restoredData.clients)) {
+                throw new Error('ملف JSON غير صالح: البيانات غير كاملة');
+            }
+
+            clients = restoredData.clients;
+            notifications = restoredData.notifications || [];
+            if (restoredData.theme) localStorage.setItem('theme', restoredData.theme);
+            if (restoredData.phoneNumber) localStorage.setItem('phoneNumber', restoredData.phoneNumber);
+            if (restoredData.password) localStorage.setItem('savedPassword', restoredData.password);
+
+            debouncedSaveClients();
+            updateClientsList();
+            updateNotifications();
+
+            showToast('تم استيراد البيانات من ملف JSON بنجاح!', 'success');
+            playNotificationSound('success');
+            addNotification('تم استعادة النسخة من ملف JSON', 'restore');
+        } catch (error) {
+            showToast('خطأ أثناء استيراد البيانات: ' + error.message, 'error');
+            console.error('Import error:', error);
+        }
+    };
+    reader.onerror = function() {
+        showToast('خطأ أثناء قراءة الملف', 'error');
+    };
+    reader.readAsText(file);
+
+    // إعادة تعيين حقل الإدخال
+    event.target.value = '';
+}
+function copyClient(clientId) {
+    if (isTrialUser()) {
+        showToast('نسخ العملاء غير متاح في النسخة التجريبية. قم بالترقية للاستفادة من هذه الميزة!', 'error');
+        return;
+    }
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+    const newClient = { ...client, id: Date.now().toString(), name: `${client.name} (نسخة)` };
+    clients.push(newClient);
+    debouncedSaveClients();
+    updateClientsList();
+    showToast('تم نسخ العميل بنجاح', 'success');
+}
+
+function recordPayment(clientId, amount) {
+    if (isTrialUser()) {
+        showToast('تسجيل الدفعات غير متاح في النسخة التجريبية. قم بالترقية للاستفادة من هذه الميزة!', 'error');
+        return;
+    }
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+    const paymentAmount = parseFloat(amount);
+    if (isNaN(paymentAmount) || paymentAmount <= 0) {
+        showToast('يرجى إدخال مبلغ صحيح', 'error');
+        return;
+    }
+    client.debt -= paymentAmount;
+    if (client.debt < 0) client.debt = 0;
+    debouncedSaveClients();
+    updateClientsList();
+    addNotification(`تم تسجيل دفعة بقيمة ${paymentAmount} للعميل ${client.name}`);
+    showToast('تم تسجيل الدفعة بنجاح', 'success');
+}
+function changePasswordPrompt() {
+  const currentPassword = prompt("أدخل كلمة المرور الحالية:");
+  if (!currentPassword) return;
+  
+  const encryptedPassword = localStorage.getItem("savedPassword");
+  if (!encryptedPassword) {
+    alert("لا توجد كلمة مرور محفوظة!");
+    return;
+  }
+  
+  let storedPassword = "";
+  try {
+    storedPassword = CryptoJS.AES.decrypt(encryptedPassword, 'bnb-secret-key-2025').toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    alert("خطأ في فك تشفير كلمة المرور الحالية");
+    return;
+  }
+  
+  if (currentPassword !== storedPassword) {
+    alert("كلمة المرور الحالية غير صحيحة");
+    return;
+  }
+  
+  const newPassword = prompt("أدخل كلمة المرور الجديدة:");
+  if (!newPassword) return;
+  
+  const confirmPassword = prompt("أعد إدخال كلمة المرور الجديدة:");
+  if (newPassword !== confirmPassword) {
+    alert("كلمة المرور الجديدة غير متطابقة");
+    return;
+  }
+  
+  const newEncryptedPassword = CryptoJS.AES.encrypt(newPassword, 'bnb-secret-key-2025').toString();
+  localStorage.setItem("savedPassword", newEncryptedPassword);
+  alert("تم تغيير كلمة المرور بنجاح!");
+}
+
+
+   </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>               
